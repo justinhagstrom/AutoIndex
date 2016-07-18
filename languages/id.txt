@@ -1,0 +1,93 @@
+// Bahasa Indonesia langauge file
+// Translated By Drajat Hasan <drajat@feraproject.wc.lt>
+English		Bahasa Indonesia
+
+index of	Pengindeksan
+parent directory	Direktori Induk
+thumbnail of	Thumbnail dari
+continue	Lanjutkan
+
+file	Arsip
+files	Arsip yang banyak
+folder	Berkas
+folders	Berkas yang banyak
+size	Ukuran
+total size	Jumlah Ukuran
+total downloads	Jumlah Unduhan
+total	Jumlah
+date	Termodifikasi
+description	Deskripsi
+downloads	Unduhan
+type	Tipe
+sort by	Urutkan Berdasarkan
+
+search	Pencarian
+both	Keduanya
+search results for	Hasil Pencarian Dari
+and its subdirectories	Dan Ini Adalah Subdirektori
+
+account	Akun Pengguna
+login	Nasuk
+logout	Keluar
+username	Nama Pengguna
+password	Kata tepat
+select user to remove	Pilih Pengguna Untuk Dihapus
+are you sure you want to remove the user	Apakah anda yakin ingin menghapus pengguna ini
+delete this user	Hapus pengguna ini
+add user	Tambah Pengguna
+
+guest	Tamu
+user	Pengguna 
+mod	Moderator
+admin	Administrator
+level	Tingkatan pengguna
+
+rename	ganti nama/pindah
+renaming	Menganti nama
+new filename	Nama file baru
+you can also move the file by specifying a path	Anda dapat memindah sebuah file dengan menspesifikan tempatnya
+delete	hapus
+are you sure you want to delete the file	Anda yakin ingin menghapus file tersebut
+edit description	Ubah deskripsi
+yes, delete	Ya, hapus
+
+upload	Unggah
+files to this folder	Arsipkan ke berkas ini
+uploaded files	Unggah arsip
+failed files	Arsip yang gagal
+none	Kosong
+file already exists	Arsip telah tersedia
+filename is listed as a hidden file	Nama arsip telah terdaftar sebagai arsip tersembuny9i
+
+reconfigure script	Skrip pengaturan ulang
+create new directory in this folder	Buat direktori baru (dalam berkas ini)
+edit list of hidden files	Ubah daftar arsip tersembunyi
+add new user	Tambah pengguna baru
+delete user	Haous Pengguna
+copy url	Salin file yang dikendalikan (Kedalam berkas ini)
+upload to ftp	Unggah arsip ke peladen FTP 
+
+enter the new description for the file	Sisipkan deskripsi baru dari arsip ini
+change	Ubah
+enter the new name	Masukan nama baru
+create	Buat
+
+add	Tambah
+remove	Hapus
+remove a hidden file Hapus arsip tersembuyi ini
+add a new hidden file	Tambahkan sebuah arsip tersembunyi
+
+edit ban list	Ubah daftar IP dan Nama Host
+remove a ban	Hapus Larangan
+add a new ban	Tambah larangan baru (Alamat IP atau Nama Host, Anda bisa menggunakan hak wewenang penuh)
+the administrator has blocked your ip address or hostname	Maaf, Administrator telah mem-block Alamat IP anda atau Nama Host
+
+view entries from log file	Lihat seluruh catatan arsip 
+view statistics from log file	Lihat statistik catatan arsip 
+how many entries would you like to view	 Berapa banyak keseluruhan yang ingin anda lihat
+view	Lihat
+page	Halaman
+of	Untuk/Bisa/Dari/
+
+calculate md5sum	menghitung md5sum
+download directory as tar.gz archive	Unduh direktori sebagai arsip tar.gz
