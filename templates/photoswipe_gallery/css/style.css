@@ -1,0 +1,12 @@
+*{
+  padding:0;
+  margin:0;
+}
+figure{
+  display: inline-block;
+  width:200px;
+}
+img{
+  height: auto;
+  max-width: 100%;
+}
