@@ -5,3 +5,14 @@ classes
 index_icons
 languages
 templates
+change_log*
+download_count
+license.html
+readme.html
+access_log
+*~
+.git*
+.tags
+/js
+/css
+README.md5
