@@ -82,12 +82,22 @@ class FileItem extends Item
 		$this -> downloads = (DOWNLOAD_COUNT && $downloads -> is_set($parent_dir . $filename) ? (int)($downloads -> __get($parent_dir . $filename)) : 0);
 		$this -> link = Url::html_output($_SERVER['PHP_SELF']) . '?dir=' . Url::translate_uri(substr($this -> parent_dir, strlen($config -> __get('base_dir'))))
 		. '&amp;file=' . Url::translate_uri($filename);
-		if (THUMBNAIL_HEIGHT && in_array(self::ext($filename), array('png', 'jpg', 'jpeg', 'gif')))
-		{
-			$this -> thumb_link = ' <img src="' . Url::html_output($_SERVER['PHP_SELF'])
-			. '?thumbnail='. Url::translate_uri($this -> parent_dir . $filename)
-			. '" alt="' . $words -> __get('thumbnail of') . ' ' . $filename
-			. '" />';
+		// IMAGES
+		if (in_array(self::ext($filename), array('png', 'jpg', 'jpeg', 'gif'))){
+			if (THUMBNAIL_HEIGHT)
+			{
+				$this -> thumb_link = ' <img src="' . Url::html_output($_SERVER['PHP_SELF'])
+				. '?thumbnail='. Url::translate_uri($this -> parent_dir . $filename)
+				. '" alt="' . $words -> __get('thumbnail of') . ' ' . $filename
+				. '" />';
+			}
+			$imagedata=getimagesize ($this -> parent_dir . $filename);
+			
+			$this -> width = strval($imagedata[0]);
+			$this -> height = strval($imagedata[1]);
+		} else {
+			$this -> width = '';
+			$this -> height = '';
 		}
 		$size = $this -> size -> __get('bytes');
 		if (MD5_SHOW && $size > 0 && $size / 1048576 <= $config -> __get('md5_show'))
@@ -114,5 +124,3 @@ class FileItem extends Item
 		. '</em> not set in FileItem class.');
 	}
 }
-
-?>
