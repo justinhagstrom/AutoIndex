@@ -119,6 +119,11 @@ if (@get_magic_quotes_gpc())
 	$_GET = array_map('stripslashes', $_GET);
 	$_POST = array_map('stripslashes', $_POST);
 }
+if (!function_exists('set_magic_quotes_runtime')){
+	function set_magic_quotes_runtime($new_setting) {
+	    return true;
+	}
+}
 @set_magic_quotes_runtime(0);
 
 $_GET = array_change_key_case($_GET, CASE_LOWER);
