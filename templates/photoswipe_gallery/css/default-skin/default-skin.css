@@ -480,3 +480,13 @@ a.pswp__share--download:hover {
 
 .pswp--minimal--dark .pswp__top-bar {
   background: none; }
+
+  
+  /* 
+    Adaptions by rubo77
+  */
+
+  .pswp__button--arrow--left, .pswp__button--arrow--right {
+   width: 500px;
+   height: 300px;
+  }
