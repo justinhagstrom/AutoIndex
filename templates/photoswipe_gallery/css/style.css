@@ -2,9 +2,15 @@
   padding:0;
   margin:0;
 }
+body{
+    padding:20px;
+    font-family: sans-serif;
+}
 figure{
   display: inline-block;
   width:200px;
+  margin-right: 10px;
+  margin-bottom: 20px;
 }
 img{
   height: auto;
