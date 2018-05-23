@@ -1,3 +1,4 @@
-/*.jpg
+*.jpg
 access_log
 download_count
+/AutoIndex.conf.php
