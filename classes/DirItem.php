@@ -142,6 +142,8 @@ class DirItem extends Item
 			$this -> link = Url::html_output($_SERVER['PHP_SELF']) . '?dir='
 			. Url::translate_uri(substr($this -> parent_dir, strlen($config -> __get('base_dir'))) . $filename);
 		}
+		$this -> width = '';
+		$this -> height = '';
 	}
 	
 	/**
