@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  app:
+    image: tan3/php-apache
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www/html
