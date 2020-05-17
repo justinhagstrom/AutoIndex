@@ -74,7 +74,10 @@ class Image
 			case 'jpg':
 			case 'jpe':
 			{
-				$src = @imagecreatefromjpeg($file);
+				if(!function_exists('imagecreatefromjpeg')){
+					die("Error: missing function imagecreatefromjpeg! use <pre>sudo apt install php-gd</pre>");
+				}
+				$src = imagecreatefromjpeg($file);
 				break;
 			}
 			case 'png':
