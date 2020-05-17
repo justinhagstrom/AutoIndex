@@ -187,7 +187,7 @@ abstract class Item
 			$s = (($age_r == 1) ? '' : 's');
 			
 			$this -> new_icon = (($days_new > 0 && $age <= $days_new) ?
-			(ICON_PATH ? ' <img src="' . $config -> __get('icon_path')
+			(ICON_PATH ? ' <img loading="lazy" src="' . $config -> __get('icon_path')
 			. 'new.png" alt="' . "$age_r day$s" . ' old" height="14" width="28" />' : ' <span class="autoindex_small" style="color: #FF0000;">[New]</span>') : '');
 		}
 	}

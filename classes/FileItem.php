@@ -86,7 +86,7 @@ class FileItem extends Item
 		if (in_array(self::ext($filename), array('png', 'jpg', 'jpeg', 'gif'))){
 			if (THUMBNAIL_HEIGHT)
 			{
-				$this -> thumb_link = ' <img src="' . Url::html_output($_SERVER['PHP_SELF'])
+				$this -> thumb_link = ' <img loading="lazy" src="' . Url::html_output($_SERVER['PHP_SELF'])
 				. '?thumbnail='. Url::translate_uri($this -> parent_dir . $filename)
 				. '" alt="' . $words -> __get('thumbnail of') . ' ' . $filename
 				. '" />';

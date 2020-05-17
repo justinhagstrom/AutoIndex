@@ -2,7 +2,7 @@
  <tr class="{file:tr_class}">
   <td class="autoindex_td">
    <a class="autoindex_a" href="{file:link}">
-    {if:icon_path}<img width="16" height="16" alt="[{file:file_ext}]" src="{file:icon}" />{end if:icon_path}
+    {if:icon_path}<img loading="lazy" width="16" height="16" alt="[{file:file_ext}]" src="{file:icon}" />{end if:icon_path}
     {file:filename} {file:thumbnail}
    </a>{file:new_icon}{file:md5_link}{file:delete_link}{file:rename_link}{file:edit_description_link}{file:ftp_upload_link}
   </td>
