@@ -15,4 +15,7 @@ access_log
 .tags
 /js
 /css
-README.md5
+README.md
+AutoIndex.conf.php.example
+img
+docker-compose.yml
