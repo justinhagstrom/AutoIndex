@@ -165,48 +165,42 @@ class DirectoryList implements Iterator
 	 * @param array $array The array to search
 	 * @return bool True if $string matches any elements in $array
 	 */
-	public static function match_in_array($string, &$array)
-	{
-		$string = Item::get_basename($string);
-		static $replace = array(
+	public static function match_in_array($string, $array) {
+		$regex = array();
+		static $replace = array (
 			'\*' => '[^\/]*',
 			'\+' => '[^\/]+',
 			'\?' => '[^\/]?');
-		foreach ($array as $m)
-		{
-			if (preg_match('/^' . strtr(preg_quote(Item::get_basename($m), '/'), $replace) . '$/i', $string))
-			{
-				return true;
-			}
-		}
-		return false;
+		foreach ($array as $m) $regex[] .= preg_quote(Item::get_basename($m), '/');
+		$regex = '/^('.strtr(implode('|', $regex), $replace).')$/i';
+		if ($string === null) return $regex;
+		return preg_match($regex, Item::get_basename($string));
 	}
-	
+
+
 	/**
 	 * @param string $t The file or folder name
 	 * @param bool $is_file
 	 * @return bool True if $t is listed as a hidden file
 	 */
-	public static function is_hidden($t, $is_file = true)
-	{
+	public static function is_hidden($t, $is_file = true) {
+		global $you, $hidden_files, $show_only_these_files;
 		$t = Item::get_basename($t);
-		if ($t == '.' || $t == '')
-		{
-			return true;
+		if ($t == '.' || $t == '') return true;
+		if ($you -> level >= ADMIN) return false; //allow admins to view hidden files
+		if ($is_file && count($show_only_these_files)) {
+			if (self::$show_only_these_files === null) {
+				self::$show_only_these_files = self::match_in_array(null, $show_only_these_files);
+			}
+			return !preg_match(self::$show_only_these_files, $t);
 		}
-		global $you;
-		if ($you -> level >= ADMIN)
-		//allow admins to view hidden files
-		{
-			return false;
+		if (self::$hidden_files === null) {
+			self::$hidden_files = self::match_in_array(null, $hidden_files);
 		}
-		global $hidden_files, $show_only_these_files;
-		if ($is_file && count($show_only_these_files))
-		{
-			return (!self::match_in_array($t, $show_only_these_files));
-		}
-		return self::match_in_array($t, $hidden_files);
+		return preg_match(self::$hidden_files, $t);
 	}
+	private static $show_only_these_files = null;
+	private static $hidden_files = null;
 	
 	/**
 	 * @param string $var The key to look for
