@@ -119,7 +119,7 @@ if (@get_magic_quotes_gpc())
 	$_GET = array_map('stripslashes', $_GET);
 	$_POST = array_map('stripslashes', $_POST);
 }
-@set_magic_quotes_runtime(0);
+if (function_exists('set_magic_quotes_runtime')) @set_magic_quotes_runtime(0);
 
 $_GET = array_change_key_case($_GET, CASE_LOWER);
 $_POST = array_change_key_case($_POST, CASE_LOWER);
@@ -316,7 +316,7 @@ try
 			{
 				continue;
 			}
-			if ($b_list[$i]{0} === ':')
+			if (substr($b_list[$i], 0, 1) === ':')
 			{
 				$only_these_ips[] = substr($b_list[$i], 1);
 			}
@@ -356,7 +356,7 @@ try
 			{
 				continue;
 			}
-			if ($hidden_list[$i]{0} === ':')
+			if (substr($hidden_list[$i], 0, 1) === ':')
 			{
 				$show_only_these_files[] = substr($hidden_list[$i], 1);
 			}
