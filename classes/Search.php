@@ -74,11 +74,18 @@ class Search extends DirectoryListDetailed
 	 * @param string $string
 	 * @return bool True if string matches filename
 	 */
-	private static function match(&$filename, &$string)
+	private static function match($filename, $string)
 	{
-		if (preg_match_all('/(?<=")[^"]+(?=")|[^ "]+/', $string, $matches))
+		if (self::$parsed === null) {
+			self::$parsed = false;
+			if (preg_match_all('/(?<=")[^"]+(?=")|[^ "]+/', $string, $matches))
+			{
+				self::$parsed = $matches[0];
+			}
+		}
+		if (self::$parsed)
 		{
-			foreach ($matches[0] as $w)
+			foreach (self::$parsed as $w)
 			{
 				if (stripos($filename, $w) !== false)
 				{
@@ -88,6 +95,7 @@ class Search extends DirectoryListDetailed
 		}
 		return false;
 	}
+	private static $parsed = null;
 	
 	/**
 	 * Merges $obj into $this.
@@ -133,13 +141,17 @@ class Search extends DirectoryListDetailed
 	 * @param string $dir The folder to search (recursive)
 	 * @param string $mode Should be f (files), d (directories), or fd (both)
 	 */
-	public function __construct($query, $dir, $mode)
+	public function __construct($query, $dir, $mode, $mode_d = false)
 	{
 		if (strlen($query) < 2 || strlen($query) > 20)
 		{
 			throw new ExceptionDisplay('Search query is either too long or too short.');
 		}
-		$mode = self::clean_mode($mode);
+		if (is_string($mode)) {
+			$mode = self::clean_mode($mode);
+			$mode_d = stripos($mode, 'd') !== false;
+			$mode = stripos($mode, 'f') !== false;
+		}
 		$dir = Item::make_sure_slash($dir);
 		DirectoryList::__construct($dir);
 		$this -> matches = array();
@@ -153,7 +165,7 @@ class Search extends DirectoryListDetailed
 			}
 			if (@is_dir($dir . $item))
 			{
-				if (stripos($mode, 'd') !== false && self::match($item, $query))
+				if ($mode_d && self::match($item, $query))
 				{
 					$temp = new DirItem($dir, $item);
 					$this -> matches[] = $temp;
@@ -163,10 +175,10 @@ class Search extends DirectoryListDetailed
 					}
 					$this -> total_folders++;
 				}
-				$sub_search = new Search($query, $dir . $item, $mode);
+				$sub_search = new Search($query, $dir . $item, $mode, $mode_d);
 				$this -> merge($sub_search);
 			}
-			else if (stripos($mode, 'f') !== false && self::match($item, $query))
+			else if ($mode && self::match($item, $query))
 			{
 				$temp = new FileItem($dir, $item);
 				$this -> matches[] = $temp;
