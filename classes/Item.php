@@ -146,20 +146,17 @@ abstract class Item
 	 */
 	public static function get_basename($fn)
 	{
-		return basename(str_replace('\\', '/', $fn));
+		return basename(strtr($fn, '\\', '/'));
 	}
-	
+
 	/**
 	 * @param string $path The directory name
 	 * @return string If there is no slash at the end of $path, one will be added
 	 */
 	public static function make_sure_slash($path)
 	{
-		$path = str_replace('\\', '/', $path);
-		if (!preg_match('#/$#', $path))
-		{
-			$path .= '/';
-		}
+		$path = strtr($path, '\\', '/');
+		if (substr($path, -1) != '/') $path .= '/';
 		return $path;
 	}
 	
