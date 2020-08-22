@@ -27,9 +27,6 @@
 
 if (!defined('IN_AUTOINDEX') || !IN_AUTOINDEX) die;
 
-
-
-
 /**
  * Maintains an array of all files and folders in a directory. Each entry is
  * stored as a string (the filename).
@@ -39,7 +36,6 @@ if (!defined('IN_AUTOINDEX') || !IN_AUTOINDEX) die;
  * @package AutoIndex
  */
 class DirectoryList implements Iterator {
-
 	/**
 	 * @var string The directory this object represents
 	 */
@@ -67,8 +63,6 @@ class DirectoryList implements Iterator {
 	public function current() {
 		if ($this->i < count($this->contents)) {
 			return $this->contents[$this->i];
-
-
 		}
 		return false;
 	}
@@ -82,7 +76,6 @@ class DirectoryList implements Iterator {
 	public function next() {
 		$this->i++;
 		return $this->current();
-
 	}
 
 	/**
@@ -90,7 +83,6 @@ class DirectoryList implements Iterator {
 	 */
 	public function rewind() {
 		$this->i = 0;
-
 	}
 
 	/**
@@ -98,15 +90,13 @@ class DirectoryList implements Iterator {
 	 */
 	public function valid() {
 		return ($this->i < count($this->contents));
-
 	}
 
 	/**
 	 * @return int Returns $i, the key of the array
 	 */
 	public function key() {
-
-		return $this -> i;
+		return $this->i;
 	}
 	//end implementation of Iterator
 
@@ -114,14 +104,17 @@ class DirectoryList implements Iterator {
 	public function is_dir($item) {
 		if ($item == '..') return true;
 		if ($this->dirs === null) {
-			$dirs = $this->cache_file('dirs');
+			$dirs = $this->cache_file('dirs', false);
 			if ($dirs === null) {
 				$this->dirs = array();
+				$batch = array();
 				foreach ($this->contents as $name) {
 					if ($name == '..') continue;
-					if (@filetype($this->dir_name.$name) == 'dir') {
-						$this->dirs[$name] = true;
-					}
+					$batch[$name] = $this->dir_name.$name;
+				}
+				$batch = array_map('filetype', $batch);
+				foreach ($batch as $name => $type) {
+					if ($type == 'dir') $this->dirs[$name] = true;
 				}
 				$this->cache_file('dirs', implode("\n", array_keys($this->dirs)));
 			} else {
@@ -138,22 +131,18 @@ class DirectoryList implements Iterator {
 		$total_size = $this->cache_file('size');
 		if ($total_size === null) {
 			$total_size = 0;
+			$batch = array();
 			foreach ($this as $current) {
 				if ($current == '..') continue;
-				$t = $this -> dir_name . $current;
+				$t = $this->dir_name.$current;
 				if ($this->is_dir($current)) {
-
-
-
 					$temp = new DirectoryList($t);
-					$total_size += $temp -> size_recursive();
+					$total_size += $temp->size_recursive();
 				} else {
-
-
-
-					$total_size += @filesize($t);
+					$batch[] = $t;
 				}
 			}
+			$total_size += array_sum(array_map('filesize', $batch));
 			$this->cache_file('size', $total_size);
 		}
 		return doubleval($total_size);
@@ -164,10 +153,10 @@ class DirectoryList implements Iterator {
 	private function cache_file($prefix, $value = null) {
 		if ($this->dir_md5 === null) $this->dir_md5 = md5($this->dir_name);
 		$file = CACHE_STORAGE_DIR.'.ht_'.$this->dir_md5.'_'.$prefix;
-		if ($value === null) {
+		if ($value === null || $value === false) {
 			if (@file_exists($file)) {
 				$mtime = @filemtime($file);
-				if ($mtime > time() - 3600) {
+				if ($value === false || $mtime > time() - 24*3600) {
 					if ($this->dir_mtime === null) $this->dir_mtime = filemtime($this->dir_name);
 					if ($mtime >= $this->dir_mtime) {
 						return @file_get_contents($file);
@@ -186,22 +175,15 @@ class DirectoryList implements Iterator {
 	 * @return int The total number of files in this directory (recursive)
 	 */
 	public function num_files() {
-		$count = $this->cache_file('count');
+		$count = $this->cache_file('count', false);
 		if ($count === null) {
 			$count = 0;
 			foreach ($this as $current) {
 				if ($current == '..') continue;
 				if ($this->is_dir($current)) {
 					$temp = new DirectoryList($this->dir_name.$current);
-
-
-
-
-					$count += $temp -> num_files();
+					$count += $temp->num_files();
 				} else {
-
-
-
 					$count++;
 				}
 			}
@@ -218,7 +200,6 @@ class DirectoryList implements Iterator {
 	public static function match_in_array($string, $array) {
 		$regex = array();
 		static $replace = array (
-
 			'\*' => '[^\/]*',
 			'\+' => '[^\/]+',
 			'\?' => '[^\/]?');
@@ -226,10 +207,6 @@ class DirectoryList implements Iterator {
 		$regex = '/^('.strtr(implode('|', $regex), $replace).')$/i';
 		if ($string === null) return $regex;
 		return preg_match($regex, Item::get_basename($string));
-
-
-
-
 	}
 
 	/**
@@ -265,23 +242,18 @@ class DirectoryList implements Iterator {
 	public function __get($var) {
 		if ($var == 'list_count') return count($this->contents);
 		if (isset($this -> $var)) {
-
 			return $this -> $var;
 		}
 		throw new ExceptionDisplay('Variable <em>'.Url::html_output($var).'</em> not set in DirectoryList class.');
-
 	}
 
 	/**
 	 * @param string $path
 	 */
 	public function __construct($path) {
-
 		$path = Item::make_sure_slash($path);
 		if (!@is_dir($path)) {
 			throw new ExceptionDisplay('Directory <em>'.Url::html_output($path).'</em> does not exist.');
-
-
 		}
 		$temp_list = @scandir($path);
 		if ($temp_list === false) {
@@ -298,5 +270,4 @@ class DirectoryList implements Iterator {
 		$this->contents = $contents;
 		$this->i = 0;
 	}
-}
-
+} 
