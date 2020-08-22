@@ -165,7 +165,7 @@ class DirectoryListDetailed extends DirectoryList
 		$dirs = $files = array();
 		foreach ($this as $t)
 		{
-			if ($this->is_dir($path . $t))
+			if ($this->is_dir($t))
 			{
 				$temp = new DirItem($path, $t);
 				if ($temp -> __get('is_parent_dir'))
