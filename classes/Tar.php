@@ -106,7 +106,7 @@ class Tar
 		foreach ($filenames as $base)
 		{
 			$name = $filenames -> __get('dir_name') . $base;
-			if (@is_dir($name))
+			if ($filenames->is_dir($base))
 			{
 				if ($base != '.' && $base != '..')
 				{
