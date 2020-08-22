@@ -45,32 +45,32 @@ class DirectoryListDetailed extends DirectoryList
 	 * @var string The HTML text that makes up the path navigation links
 	 */
 	protected $path_nav;
-	
+
 	/**
 	 * @var int Total number of files in this directory
 	 */
 	protected $total_files;
-	
+
 	/**
 	 * @var int Total number of folders in this directory
 	 */
 	protected $total_folders;
-	
+
 	/**
 	 * @var int Total number of folders in this directory (including parent)
 	 */
 	protected $raw_total_folders;
-	
+
 	/**
 	 * @var int Total number of downloads of files in this directory
 	 */
 	protected $total_downloads;
-	
+
 	/**
 	 * @var Size Total size of this directory (recursive)
 	 */
 	protected $total_size;
-	
+
 	/**
 	 * @return string The HTML text that makes up the path navigation
 	 */
@@ -93,7 +93,7 @@ class DirectoryListDetailed extends DirectoryList
 		}
 		return $temp;
 	}
-	
+
 	/**
 	 * Returns -1 if $a < $b or 1 if $a > $b
 	 *
@@ -135,7 +135,7 @@ class DirectoryListDetailed extends DirectoryList
 		}
 		return ((strtolower($_SESSION['sort_mode']) === 'd') ? -$val : $val);
 	}
-	
+
 	/**
 	 * @param array $list The array to be sorted with the callback_sort function
 	 */
@@ -143,7 +143,7 @@ class DirectoryListDetailed extends DirectoryList
 	{
 		usort($list, array('self', 'callback_sort'));
 	}
-	
+
 	/**
 	 * @return int The total number of files and folders (including the parent folder)
 	 */
@@ -151,7 +151,7 @@ class DirectoryListDetailed extends DirectoryList
 	{
 		return $this -> raw_total_folders + $this -> total_files;
 	}
-	
+
 	/**
 	 * @param string $path The directory to read the files from
 	 * @param int $page The number of files to skip (used for pagination)
@@ -163,11 +163,18 @@ class DirectoryListDetailed extends DirectoryList
 		$subtract_parent = false;
 		$this -> total_downloads = $total_size = 0;
 		$dirs = $files = array();
+		$old = getcwd();
+		chdir($path);
+		$mtime = array_map('filemtime', $this->contents);
+		$types = array_map('filetype', $this->contents);
+		$size = array_map('filesize', $this->contents);
+		chdir($old);
 		foreach ($this as $t)
 		{
-			if ($this->is_dir($t))
+			$type = $types[$this->key()];
+			if ($type == 'dir')
 			{
-				$temp = new DirItem($path, $t);
+				$temp = new DirItem($path, $t, $mtime[$this->key()]);
 				if ($temp -> __get('is_parent_dir'))
 				{
 					$dirs[] = $temp;
@@ -182,15 +189,12 @@ class DirectoryListDetailed extends DirectoryList
 					}
 				}
 			}
-			else //if (@is_file($path . $t))
+			else if ($type == 'file')
 			{
-				$temp = new FileItem($path, $t);
-				if ($temp -> __get('filename') !== false)
-				{
-					$files[] = $temp;
-					$this -> total_downloads += $temp -> __get('downloads');
-					$total_size += $temp -> __get('size') -> __get('bytes');
-				}
+				$temp = new FileItem($path, $t, true, $size[$this->key()], $mtime[$this->key()]);
+				$files[] = $temp;
+				$this -> total_downloads += $temp -> __get('downloads');
+				$total_size += $temp -> __get('size') -> __get('bytes');
 			}
 		}
 		self::sort_list($dirs);
@@ -204,7 +208,7 @@ class DirectoryListDetailed extends DirectoryList
 			$this -> total_folders--;
 		}
 		$this -> path_nav = $this -> set_path_nav();
-		
+
 		//Paginate the files
 		if (ENTRIES_PER_PAGE)
 		{
@@ -221,7 +225,7 @@ class DirectoryListDetailed extends DirectoryList
 			$this -> contents = array_slice($this -> contents, ($page - 1) * $num_per_page, $num_per_page);
 		}
 	}
-	
+
 	/**
 	 * @return string The HTML text of the directory list, using the template system
 	 */
