@@ -189,7 +189,7 @@ class DirectoryListDetailed extends DirectoryList
 			}
 			else
 			{
-				$temp = new FileItem($path, $t, true, $size[$this->key()], $mtime[$this->key()]);
+				$temp = new FileItem($path, $t, $size[$this->key()], $mtime[$this->key()]);
 				$files[] = $temp;
 				$this -> total_downloads += $temp -> __get('downloads');
 				$total_size += $temp -> __get('size') -> __get('bytes');
