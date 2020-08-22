@@ -240,8 +240,8 @@ try
 		. Url::html_output(CONFIG_GENERATOR) . '</em> nor <em>'
 		. Url::html_output(CONFIG_STORED) . '</em> could be found.');
 	}
-	
-	
+
+
 	//find and store the user's IP address and hostname:
 	$ip = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'N/A');
 	if (isset($_SESSION['host']))
@@ -253,15 +253,15 @@ try
 		$_SESSION['host'] = $host = @gethostbyaddr($ip);
 	}
 
-	
+
 	//Create a language object:
 	$words = new Language();
-	
-	
+
+
 	//Create a logging object:
 	$log = new Logging($config -> __get('log_file'));
-	
-	
+
+
 	foreach ($config as $key => $item)
 	/* Go through each config setting, and set a constant with each setting's
 	 * name to either true or false depending on if the config setting is
@@ -277,8 +277,8 @@ try
 		}
 		define($key, ($item != 'false' && $item != '0'));
 	}
-	
-	
+
+
 	//make sure all required settings are set in the config file
 	foreach (array('base_dir', 'icon_path', 'language', 'template',
 		'log_file', 'description_file', 'user_list', 'download_count',
@@ -294,12 +294,12 @@ try
 			. '</em>');
 		}
 	}
-	
-	
+
+
 	/* From this point on, we can throw ExceptionDisplay rather than
 	 * Exception since all the configuration is done.
 	 */
-	
+
 	$b_list = $only_these_ips = $banned_ips = array();
 	if (BANNED_LIST && @is_file($config -> __get('banned_list')))
 	//make sure the user is not banned
@@ -339,7 +339,7 @@ try
 			throw new ExceptionDisplay($words -> __get('the administrator has blocked your ip address or hostname') . '.');
 		}
 	}
-	
+
 	$show_only_these_files = $hidden_files = array();
 	if (HIDDEN_FILES && @is_file($config -> __get('hidden_files')))
 	//store the hidden file list in $hidden_list
@@ -366,12 +366,12 @@ try
 			}
 		}
 	}
-	
-	
+
+
 	//size of the "chunks" that are read at a time from the file (when $force_download is on)
 	$speed = (BANDWIDTH_LIMIT ? $config -> __get('bandwidth_limit') : 8);
-	
-	
+
+
 	if (DOWNLOAD_COUNT)
 	{
 		if (!@is_file($config -> __get('download_count')))
@@ -386,8 +386,8 @@ try
 		}
 		$downloads = new ConfigData($config -> __get('download_count'));
 	}
-	
-	
+
+
 	//create a user object:
 	$log_login = false;
 	if (USE_LOGIN_SYSTEM && isset($_POST['username'], $_POST['password'])
@@ -416,13 +416,13 @@ try
 			die();
 		}
 	}
-	
-	
+
+
 	//set the logged in user's home directory:
 	$dir = Item::make_sure_slash((($you -> home_dir == '') ? $config -> __get('base_dir') : $you -> home_dir));
 	$config -> set('base_dir', $dir);
 	$subdir = '';
-	
+
 	if (isset($_GET['dir']))
 	{
 		$dir .= Url::clean_input($_GET['dir']);
@@ -468,25 +468,25 @@ try
 			$url -> download();
 		}
 	}
-	
+
 	if ($log_login)
 	{
 		$log -> add_entry('Successful login (Username: '
 		. $_SESSION['username'] . ')');
 	}
-	
+
 	if (DESCRIPTION_FILE)
 	{
 		$descriptions = new ConfigData((@is_file($config -> __get('description_file')))
 			? $config -> __get('description_file') : false);
 	}
-	
+
 	if (PARSE_HTACCESS)
 	{
 		//parse .htaccess file(s)
 		new Htaccess($dir, '.htaccess');
 	}
-	
+
 	if (MD5_SHOW && isset($_GET['md5']) && $_GET['md5'] != '')
 	{
 		$file = $dir . Url::clean_input($_GET['md5']);
@@ -505,7 +505,7 @@ try
 		die(simple_display(md5_file($file), 'md5sum of '
 		. Url::html_output($file)));
 	}
-	
+
 	if (THUMBNAIL_HEIGHT && isset($_GET['thumbnail']))
 	{
 		$fn = Url::clean_input($_GET['thumbnail']);
@@ -515,7 +515,7 @@ try
 		}
 		echo new Image($fn);
 	}
-	
+
 	if (ARCHIVE && isset($_GET['archive']))
 	{
 		$log -> add_entry('Directory archived');
@@ -524,7 +524,7 @@ try
 		{
 			$outfile = 'base_dir';
 		}
-		$mime = new MimeType('.tar'); 
+		$mime = new MimeType('.tar');
 		header('Content-Type: ' . $mime -> __toString());
 		header('Content-Disposition: attachment; filename="'
 		. $outfile . '.tar"');
@@ -533,7 +533,9 @@ try
 		$tar = new Tar($list, $outfile, strlen($dir));
 		die();
 	}
-	
+
+	header("Content-Type: text/html; charset=UTF-8");
+
 	//set the sorting mode:
 	if (isset($_GET['sort']) && $_GET['sort'] != '')
 	{
@@ -543,7 +545,7 @@ try
 	{
 		$_SESSION['sort'] = 'filename'; //default sort mode
 	}
-	
+
 	//set the sorting order:
 	if (isset($_GET['sort_mode']) && ($_GET['sort_mode'] == 'a' || $_GET['sort_mode'] == 'd'))
 	{
@@ -553,14 +555,14 @@ try
 	{
 		$_SESSION['sort_mode'] = 'a'; //default sort order
 	}
-	
+
 	if (count($_FILES) > 0)
 	//deal with any request to upload files:
 	{
 		$upload = new Upload($you); //the constructor checks if you have permission to upload
 		$upload -> do_upload();
 	}
-	
+
 	if (USE_LOGIN_SYSTEM)
 	{
 		if (isset($_GET['logout']) && $_GET['logout'] == 'true')
@@ -573,12 +575,12 @@ try
 			$admin -> action($_GET['action']);
 		}
 	}
-	
+
 	if (ANTI_LEECH && !isset($_SESSION['ref']))
 	{
 		$_SESSION['ref'] = true;
 	}
-	
+
 	if (!@is_dir(CACHE_STORAGE_DIR))
 	{
 		if (!Admin::mkdir_recursive(CACHE_STORAGE_DIR))
@@ -589,7 +591,7 @@ try
 			. '</em> so cache files can be written.');
 		}
 	}
-	
+
 	$search_log = '';
 	if (SEARCH_ENABLED && isset($_GET['search'], $_GET['search_mode'])
 		&& $_GET['search'] != '' && $_GET['search_mode'] != '')
@@ -640,5 +642,3 @@ catch (Exception $e)
 {
 	echo simple_display($e -> getMessage());
 }
-
-?>
