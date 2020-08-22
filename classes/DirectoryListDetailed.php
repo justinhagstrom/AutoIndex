@@ -166,13 +166,11 @@ class DirectoryListDetailed extends DirectoryList
 		$old = getcwd();
 		chdir($path);
 		$mtime = array_map('filemtime', $this->contents);
-		$types = array_map('filetype', $this->contents);
 		$size = array_map('filesize', $this->contents);
 		chdir($old);
 		foreach ($this as $t)
 		{
-			$type = $types[$this->key()];
-			if ($type == 'dir')
+			if ($this->is_dir($t))
 			{
 				$temp = new DirItem($path, $t, $mtime[$this->key()]);
 				if ($temp -> __get('is_parent_dir'))
@@ -189,7 +187,7 @@ class DirectoryListDetailed extends DirectoryList
 					}
 				}
 			}
-			else if ($type == 'file')
+			else
 			{
 				$temp = new FileItem($path, $t, true, $size[$this->key()], $mtime[$this->key()]);
 				$files[] = $temp;
