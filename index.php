@@ -63,7 +63,7 @@ define('ENABLE_CACHE', false);
  * in this directory. You can use an absolute path or a relative path, just
  * make sure there is a slash at the end.
  */
-define('CACHE_STORAGE_DIR', './cache/');
+define('CACHE_STORAGE_DIR', './.ht_cache/');
 
 /**
  * Format to display dates in.
@@ -579,6 +579,17 @@ try
 		$_SESSION['ref'] = true;
 	}
 	
+	if (!@is_dir(CACHE_STORAGE_DIR))
+	{
+		if (!Admin::mkdir_recursive(CACHE_STORAGE_DIR))
+		//Attempt to create the directory. If it fails, tell the user to manually make the folder.
+		{
+			throw new ExceptionDisplay('Please create the directory <em>'
+			. Url::html_output(CACHE_STORAGE_DIR)
+			. '</em> so cache files can be written.');
+		}
+	}
+	
 	$search_log = '';
 	if (SEARCH_ENABLED && isset($_GET['search'], $_GET['search_mode'])
 		&& $_GET['search'] != '' && $_GET['search_mode'] != '')
@@ -602,16 +613,6 @@ try
 		else
 		{
 			$dir_list = new DirectoryListDetailed($dir);
-			if (!@is_dir(CACHE_STORAGE_DIR))
-			{
-				if (!Admin::mkdir_recursive(CACHE_STORAGE_DIR))
-				//Attempt to create the directory. If it fails, tell the user to manually make the folder.
-				{
-					throw new ExceptionDisplay('Please create the directory <em>'
-					. Url::html_output(CACHE_STORAGE_DIR)
-					. '</em> so cache files can be written.');
-				}
-			}
 			$h = @fopen($cache, 'wb');
 			if ($h === false)
 			{
