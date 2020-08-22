@@ -48,7 +48,7 @@ class FileItem extends Item
 		$fn = Item::get_basename($fn);
 		return (strpos($fn, '.') ? strtolower(substr(strrchr($fn, '.'), 1)) : '');
 	}
-	
+
 	/**
 	 * @return string Returns the extension of the filename
 	 * @see FileItem::ext()
@@ -57,35 +57,36 @@ class FileItem extends Item
 	{
 		return self::ext($this -> filename);
 	}
-	
+
 	/**
 	 * @param string $parent_dir
 	 * @param string $filename
 	 */
-	public function __construct($parent_dir, $filename)
+	public function __construct($parent_dir, $filename, $is_file = null, $filesize = null, $filemtime = null)
 	{
-		parent::__construct($parent_dir, $filename);
-		if (!@is_file($this -> parent_dir . $filename))
-		{	
+		parent::__construct($parent_dir, $filename, $filemtime);
+		$full = $parent_dir . $filename;
+		if ($is_file === null) $is_file = @is_file($full);
+		if (!$is_file) {
 			throw new ExceptionDisplay('File <em>'
-			. Url::html_output($this -> parent_dir . $filename)
+			. Url::html_output($full)
 			. '</em> does not exist.');
 		}
 		global $config, $words, $downloads;
 		$this -> filename = $filename;
-		$this -> size = new Size(filesize($this -> parent_dir . $filename));
+		$this -> size = new Size($filesize === null ? filesize($full) : $filesize);
 		if (ICON_PATH)
 		{
 			$file_icon = new Icon($filename);
 			$this -> icon = $file_icon -> __toString();
 		}
-		$this -> downloads = (DOWNLOAD_COUNT && $downloads -> is_set($parent_dir . $filename) ? (int)($downloads -> __get($parent_dir . $filename)) : 0);
+		$this -> downloads = (DOWNLOAD_COUNT && $downloads -> is_set($full) ? (int)($downloads -> __get($full)) : 0);
 		$this -> link = Url::html_output($_SERVER['PHP_SELF']) . '?dir=' . Url::translate_uri(substr($this -> parent_dir, strlen($config -> __get('base_dir'))))
 		. '&amp;file=' . Url::translate_uri($filename);
 		if (THUMBNAIL_HEIGHT && in_array(self::ext($filename), array('png', 'jpg', 'jpeg', 'gif')))
 		{
 			$this -> thumb_link = ' <img src="' . Url::html_output($_SERVER['PHP_SELF'])
-			. '?thumbnail='. Url::translate_uri($this -> parent_dir . $filename)
+			. '?thumbnail='. Url::translate_uri($full)
 			. '" alt="' . $words -> __get('thumbnail of') . ' ' . $filename
 			. '" />';
 		}
@@ -99,7 +100,7 @@ class FileItem extends Item
 			. $words -> __get('calculate md5sum') . '</a>]</span>';
 		}
 	}
-	
+
 	/**
 	 * @param string $var The key to look for
 	 * @return mixed The data stored at the key
