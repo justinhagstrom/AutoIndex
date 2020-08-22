@@ -25,10 +25,10 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-if (!defined('IN_AUTOINDEX') || !IN_AUTOINDEX)
-{
-	die();
-}
+if (!defined('IN_AUTOINDEX') || !IN_AUTOINDEX) die;
+
+
+
 
 /**
  * Maintains an array of all files and folders in a directory. Each entry is
@@ -38,128 +38,178 @@ if (!defined('IN_AUTOINDEX') || !IN_AUTOINDEX)
  * @version 1.0.1 (June 30, 2004)
  * @package AutoIndex
  */
-class DirectoryList implements Iterator
-{
+class DirectoryList implements Iterator {
+
 	/**
 	 * @var string The directory this object represents
 	 */
 	protected $dir_name;
-	
+
 	/**
 	 * @var array The list of filesname in this directory (strings)
 	 */
 	protected $contents;
-	
+
 	/**
 	 * @var int The size of the $contents array
 	 */
 	private $list_count;
-	
+
 	//begin implementation of Iterator
 	/**
 	 * @var int $i is used to keep track of the current pointer inside the array when implementing Iterator
 	 */
 	private $i;
-	
+
 	/**
 	 * @return string The element $i currently points to in the array
 	 */
-	public function current()
-	{
-		if ($this -> i < count($this -> contents))
-		{
-			return $this -> contents[$this -> i];
+	public function current() {
+		if ($this->i < count($this->contents)) {
+			return $this->contents[$this->i];
+
+
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Increments the internal array pointer, then returns the value
 	 * at that new position.
 	 *
 	 * @return string The current position of the pointer in the array
 	 */
-	public function next()
-	{
-		$this -> i++;
-		return $this -> current();
+	public function next() {
+		$this->i++;
+		return $this->current();
+
 	}
-	
+
 	/**
 	 * Sets the internal array pointer to 0
 	 */
-	public function rewind()
-	{
-		$this -> i = 0;
+	public function rewind() {
+		$this->i = 0;
+
 	}
-	
+
 	/**
 	 * @return bool True if $i is a valid array index
 	 */
-	public function valid()
-	{
-		return ($this -> i < count($this -> contents));
+	public function valid() {
+		return ($this->i < count($this->contents));
+
 	}
-	
+
 	/**
 	 * @return int Returns $i, the key of the array
 	 */
-	public function key()
-	{
+	public function key() {
+
 		return $this -> i;
 	}
 	//end implementation of Iterator
-	
+
+	private $dirs = null;
+	public function is_dir($item) {
+		if ($item == '..') return true;
+		if ($this->dirs === null) {
+			$dirs = $this->cache_file('dirs');
+			if ($dirs === null) {
+				$this->dirs = array();
+				foreach ($this->contents as $name) {
+					if ($name == '..') continue;
+					if (@filetype($this->dir_name.$name) == 'dir') {
+						$this->dirs[$name] = true;
+					}
+				}
+				$this->cache_file('dirs', implode("\n", array_keys($this->dirs)));
+			} else {
+				$this->dirs = array_fill_keys(explode("\n", $dirs), true);
+			}
+		}
+		return isset($this->dirs[$item]);
+	}
+
 	/**
 	 * @return int The total size in bytes of the folder (recursive)
 	 */
-	public function size_recursive()
-	{
-		$total_size = 0;
-		foreach ($this as $current)
-		{
-			$t = $this -> dir_name . $current;
-			if (@is_dir($t))
-			{
-				if ($current != '..')
-				{
+	public function size_recursive() {
+		$total_size = $this->cache_file('size');
+		if ($total_size === null) {
+			$total_size = 0;
+			foreach ($this as $current) {
+				if ($current == '..') continue;
+				$t = $this -> dir_name . $current;
+				if ($this->is_dir($current)) {
+
+
+
 					$temp = new DirectoryList($t);
 					$total_size += $temp -> size_recursive();
+				} else {
+
+
+
+					$total_size += @filesize($t);
 				}
 			}
-			else
-			{
-				$total_size += @filesize($t);
-			}
+			$this->cache_file('size', $total_size);
 		}
-		return $total_size;
+		return doubleval($total_size);
 	}
-	
+
+	private $dir_mtime = null;
+	private $dir_md5 = null;
+	private function cache_file($prefix, $value = null) {
+		if ($this->dir_md5 === null) $this->dir_md5 = md5($this->dir_name);
+		$file = CACHE_STORAGE_DIR.'.ht_'.$this->dir_md5.'_'.$prefix;
+		if ($value === null) {
+			if (@file_exists($file)) {
+				$mtime = @filemtime($file);
+				if ($mtime > time() - 3600) {
+					if ($this->dir_mtime === null) $this->dir_mtime = filemtime($this->dir_name);
+					if ($mtime >= $this->dir_mtime) {
+						return @file_get_contents($file);
+					}
+				}
+			}
+		} else { // atomic write
+			$tmp = $file.'_'.microtime(true).'_'.mt_rand();
+			file_put_contents($tmp, $value);
+			rename($tmp, $file);
+		}
+		return null;
+	}
+
 	/**
 	 * @return int The total number of files in this directory (recursive)
 	 */
-	public function num_files()
-	{
-		$count = 0;
-		foreach ($this as $current)
-		{
-			$t = $this -> dir_name . $current;
-			if (@is_dir($t))
-			{
-				if ($current != '..')
-				{
-					$temp = new DirectoryList($t);
+	public function num_files() {
+		$count = $this->cache_file('count');
+		if ($count === null) {
+			$count = 0;
+			foreach ($this as $current) {
+				if ($current == '..') continue;
+				if ($this->is_dir($current)) {
+					$temp = new DirectoryList($this->dir_name.$current);
+
+
+
+
 					$count += $temp -> num_files();
+				} else {
+
+
+
+					$count++;
 				}
 			}
-			else
-			{
-				$count++;
-			}
+			$this->cache_file('count', $count);
 		}
-		return $count;
+		return intval($count);
 	}
-	
+
 	/**
 	 * @param string $string The string to search for
 	 * @param array $array The array to search
@@ -168,6 +218,7 @@ class DirectoryList implements Iterator
 	public static function match_in_array($string, $array) {
 		$regex = array();
 		static $replace = array (
+
 			'\*' => '[^\/]*',
 			'\+' => '[^\/]+',
 			'\?' => '[^\/]?');
@@ -175,8 +226,11 @@ class DirectoryList implements Iterator
 		$regex = '/^('.strtr(implode('|', $regex), $replace).')$/i';
 		if ($string === null) return $regex;
 		return preg_match($regex, Item::get_basename($string));
-	}
 
+
+
+
+	}
 
 	/**
 	 * @param string $t The file or folder name
@@ -185,14 +239,16 @@ class DirectoryList implements Iterator
 	 */
 	public static function is_hidden($t, $is_file = true) {
 		global $you, $hidden_files, $show_only_these_files;
-		$t = Item::get_basename($t);
 		if ($t == '.' || $t == '') return true;
 		if ($you -> level >= ADMIN) return false; //allow admins to view hidden files
-		if ($is_file && count($show_only_these_files)) {
-			if (self::$show_only_these_files === null) {
-				self::$show_only_these_files = self::match_in_array(null, $show_only_these_files);
+		if (count($show_only_these_files)) {
+			if (!is_bool($is_file)) $is_file = !$is_file->is_dir($t);
+			if ($is_file) {
+				if (self::$show_only_these_files === null) {
+					self::$show_only_these_files = self::match_in_array(null, $show_only_these_files);
+				}
+				return !preg_match(self::$show_only_these_files, $t);
 			}
-			return !preg_match(self::$show_only_these_files, $t);
 		}
 		if (self::$hidden_files === null) {
 			self::$hidden_files = self::match_in_array(null, $hidden_files);
@@ -201,50 +257,46 @@ class DirectoryList implements Iterator
 	}
 	private static $show_only_these_files = null;
 	private static $hidden_files = null;
-	
+
 	/**
 	 * @param string $var The key to look for
 	 * @return mixed The data stored at the key
 	 */
-	public function __get($var)
-	{
-		if (isset($this -> $var))
-		{
+	public function __get($var) {
+		if ($var == 'list_count') return count($this->contents);
+		if (isset($this -> $var)) {
+
 			return $this -> $var;
 		}
-		throw new ExceptionDisplay('Variable <em>' . Url::html_output($var)
-		. '</em> not set in DirectoryList class.');
+		throw new ExceptionDisplay('Variable <em>'.Url::html_output($var).'</em> not set in DirectoryList class.');
+
 	}
-	
+
 	/**
 	 * @param string $path
 	 */
-	public function __construct($path)
-	{
+	public function __construct($path) {
+
 		$path = Item::make_sure_slash($path);
-		if (!@is_dir($path))
-		{
-			throw new ExceptionDisplay('Directory <em>' . Url::html_output($path)
-			. '</em> does not exist.');
+		if (!@is_dir($path)) {
+			throw new ExceptionDisplay('Directory <em>'.Url::html_output($path).'</em> does not exist.');
+
+
 		}
 		$temp_list = @scandir($path);
-		if ($temp_list === false)
-		{
-			throw new ExceptionDisplay('Error reading from directory <em>'
-			. Url::html_output($path) . '</em>.');
+		if ($temp_list === false) {
+			throw new ExceptionDisplay('Error reading from directory <em>'.Url::html_output($path).'</em>.');
 		}
-		$this -> dir_name = $path;
-		$this -> contents = array();
-		foreach ($temp_list as $t)
-		{
-			if (!self::is_hidden($t, !@is_dir($path . $t)))
-			{
-				$this -> contents[] = $t;
+		$this->dir_name = $path;
+		$this->contents = $temp_list;
+		$contents = array();
+		foreach ($temp_list as $t) {
+			if (!self::is_hidden($t, $this)) {
+				$contents[] = $t;
 			}
 		}
-		$this -> list_count = count($this -> contents);
-		$this -> i = 0;
+		$this->contents = $contents;
+		$this->i = 0;
 	}
 }
 
-?>
