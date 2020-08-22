@@ -62,16 +62,10 @@ class FileItem extends Item
 	 * @param string $parent_dir
 	 * @param string $filename
 	 */
-	public function __construct($parent_dir, $filename, $is_file = null, $filesize = null, $filemtime = null)
+	public function __construct($parent_dir, $filename, $filesize = null, $filemtime = null)
 	{
 		parent::__construct($parent_dir, $filename, $filemtime);
 		$full = $parent_dir . $filename;
-		if ($is_file === null) $is_file = @is_file($full);
-		if (!$is_file) {
-			throw new ExceptionDisplay('File <em>'
-			. Url::html_output($full)
-			. '</em> does not exist.');
-		}
 		global $config, $words, $downloads;
 		$this -> filename = $filename;
 		$this -> size = new Size($filesize === null ? filesize($full) : $filesize);
