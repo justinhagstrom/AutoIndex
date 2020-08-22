@@ -141,13 +141,12 @@ class Search extends DirectoryListDetailed
 	 * @param string $dir The folder to search (recursive)
 	 * @param string $mode Should be f (files), d (directories), or fd (both)
 	 */
-	public function __construct($query, $dir, $mode, $mode_d = false)
-	{
-		if (strlen($query) < 2 || strlen($query) > 20)
-		{
-			throw new ExceptionDisplay('Search query is either too long or too short.');
-		}
+	public function __construct($query, $dir, $mode, $mode_d = false) {
 		if (is_string($mode)) {
+			if (strlen($query) < 2 || strlen($query) > 20) {
+
+				throw new ExceptionDisplay('Search query is either too long or too short.');
+			}
 			$mode = self::clean_mode($mode);
 			$mode_d = stripos($mode, 'd') !== false;
 			$mode = stripos($mode, 'f') !== false;
@@ -159,13 +158,13 @@ class Search extends DirectoryListDetailed
 		$this -> total_downloads = $this -> total_folders = $this -> total_files = 0;
 		foreach ($this as $item)
 		{
-			if ($item == '..')
-			{
-				continue;
-			}
-			if (@is_dir($dir . $item))
-			{
+			if ($item == '..') continue;
+			if ($this->is_dir($item)) {
 				if ($mode_d && self::match($item, $query))
+
+
+
+
 				{
 					$temp = new DirItem($dir, $item);
 					$this -> matches[] = $temp;
@@ -178,8 +177,8 @@ class Search extends DirectoryListDetailed
 				$sub_search = new Search($query, $dir . $item, $mode, $mode_d);
 				$this -> merge($sub_search);
 			}
-			else if ($mode && self::match($item, $query))
-			{
+			else if ($mode && self::match($item, $query)) {
+
 				$temp = new FileItem($dir, $item);
 				$this -> matches[] = $temp;
 				$this -> total_size -> add_size($temp -> __get('size'));
