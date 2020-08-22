@@ -43,7 +43,7 @@ class Url
 	 * @var string
 	 */
 	private $url;
-	
+
 	/**
 	 * Rawurlencodes $uri, but not slashes.
 	 *
@@ -55,7 +55,7 @@ class Url
 		$uri = rawurlencode(str_replace('\\', '/', $uri));
 		return str_replace(rawurlencode('/'), '/', $uri);
 	}
-	
+
 	/**
 	 * Returns the string with correct HTML entities so it can be displayed.
 	 *
@@ -64,9 +64,9 @@ class Url
 	 */
 	public static function html_output($str)
 	{
-		return htmlentities($str, ENT_QUOTES, 'UTF-8');
+		return htmlentities(self::fix($str), ENT_QUOTES, 'UTF-8');
 	}
-	
+
 	/**
 	 * Checks input for hidden files/folders, and deals with ".."
 	 *
@@ -114,7 +114,7 @@ class Url
 		}
 		return $new_dir;
 	}
-	
+
 	/**
 	 * @param string $url The URL path to check and clean
 	 * @return string Resolves $url's special chars and runs eval_dir on it
@@ -132,18 +132,18 @@ class Url
 		}
 		return self::eval_dir( $newURL );
 	}
-	
+
 	/**
 	 * Sends the browser a header to redirect it to this URL.
 	 */
 	public function redirect()
 	{
-		$site = $this -> url;
+		$site = $this->url;
 		header("Location: $site");
 		die(simple_display('Redirection header could not be sent.<br />'
 		. "Continue here: <a href=\"$site\">$site</a>"));
 	}
-	
+
 	/**
 	 * @param string $file_dl
 	 * @param bool $headers
@@ -191,7 +191,7 @@ class Url
 		}
 		fclose($fn);
 	}
-	
+
 	/**
 	 * Downloads the URL on the user's browser, using either the redirect()
 	 * or force_download() functions.
@@ -206,7 +206,19 @@ class Url
 		}
 		$this -> redirect();
 	}
-	
+
+	private static $cp = null;
+	public static function fix($text) {
+		if (strpos(PHP_OS, 'WIN') === 0) {
+			if (self::$cp === null) {
+				$cp = explode('.', setlocale(LC_CTYPE, ''));
+				self::$cp = $cp[1];
+			}
+			$text = iconv('Windows-'.self::$cp, 'utf-8', $text);
+		}
+		return $text;
+	}
+
 	/**
 	 * @param string $text_url The URL to create an object from
 	 * @param bool $special_chars If true, translate_uri will be run on the url
@@ -215,11 +227,11 @@ class Url
 	{
 		if ($special_chars)
 		{
-			$text_url = self::translate_uri($text_url);
+			$text_url = self::translate_uri(self::fix($text_url));
 		}
 		$this -> url = $text_url;
 	}
-	
+
 	/**
 	 * @return string Returns the URL as a string
 	 */
