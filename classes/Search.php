@@ -144,7 +144,6 @@ class Search extends DirectoryListDetailed
 	public function __construct($query, $dir, $mode, $mode_d = false) {
 		if (is_string($mode)) {
 			if (strlen($query) < 2 || strlen($query) > 20) {
-
 				throw new ExceptionDisplay('Search query is either too long or too short.');
 			}
 			$mode = self::clean_mode($mode);
@@ -161,10 +160,6 @@ class Search extends DirectoryListDetailed
 			if ($item == '..') continue;
 			if ($this->is_dir($item)) {
 				if ($mode_d && self::match($item, $query))
-
-
-
-
 				{
 					$temp = new DirItem($dir, $item);
 					$this -> matches[] = $temp;
@@ -178,7 +173,6 @@ class Search extends DirectoryListDetailed
 				$this -> merge($sub_search);
 			}
 			else if ($mode && self::match($item, $query)) {
-
 				$temp = new FileItem($dir, $item);
 				$this -> matches[] = $temp;
 				$this -> total_size -> add_size($temp -> __get('size'));
