@@ -175,7 +175,7 @@ class DirectoryList implements Iterator {
 	 * @return int The total number of files in this directory (recursive)
 	 */
 	public function num_files() {
-		$count = $this->cache_file('count', false);
+		$count = $this->cache_file('count');
 		if ($count === null) {
 			$count = 0;
 			foreach ($this as $current) {
@@ -263,9 +263,8 @@ class DirectoryList implements Iterator {
 		$this->contents = $temp_list;
 		$contents = array();
 		foreach ($temp_list as $t) {
-			if (!self::is_hidden($t, $this)) {
-				$contents[] = $t;
-			}
+			if (self::is_hidden($t, $this)) continue;
+			$contents[] = $t;
 		}
 		$this->contents = $contents;
 		$this->i = 0;
