@@ -234,8 +234,9 @@ class TemplateFiles extends TemplateInfo
 				array($this, 'callback_type'), $this -> out);
 			$temp_line = preg_replace_callback('/\{\s*do_every\s*:\s*(\d+)\s*\}(.*)\{\s*end\s*do_every\s*\}/Uis',
 				array($this, 'callback_do_every'), $temp_line);
-			$final_file_line .= preg_replace_callback('/\{\s*file\s*:\s*(\w+)\s*\}/Ui',
+			$temp_line = preg_replace_callback('/\{\s*file\s*:\s*(\w+)\s*\}/Ui',
 				array($this, 'callback_file'), $temp_line);
+			$final_file_line .= $temp_line;
 		}
 		$this -> out = $final_file_line;
 	}
