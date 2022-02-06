@@ -596,7 +596,7 @@ try
 	if (SEARCH_ENABLED && isset($_GET['search'], $_GET['search_mode'])
 		&& $_GET['search'] != '' && $_GET['search_mode'] != '')
 	{
-		$s = Url::clean_input($_GET['search']);
+		$s = $_GET['search'];
 		$dir_list = new Search($s, $dir, $_GET['search_mode']);
 		$search_log = "Search: $s";
 	}
