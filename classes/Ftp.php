@@ -89,7 +89,6 @@ class Ftp extends DirectoryList
 			$this -> is_directory[] = (strtolower($file{0}) === 'd');
 			$this -> contents[] = $path . substr($name, 1);
 		}
-		$this -> list_count = count($this -> contents);
 		$this -> i = 0;
 	}
 	

@@ -91,7 +91,7 @@ class Size
 	 */
 	public function __construct($bytes)
 	{
-		$this -> bytes = ((is_bool($bytes)) ? $bytes : max((int)$bytes, 0));
+		$this -> bytes = ((is_bool($bytes)) ? $bytes : max((double)$bytes, 0));
 	}
 	
 	/**

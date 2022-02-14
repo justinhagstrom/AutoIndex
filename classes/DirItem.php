@@ -43,7 +43,7 @@ class DirItem extends Item
 	 * @var DirectoryList The list of this directory's contents
 	 */
 	private $temp_list;
-	
+
 	/**
 	 * @return string Always returns 'dir', since this is a directory, not a file
 	 */
@@ -51,7 +51,7 @@ class DirItem extends Item
 	{
 		return 'dir';
 	}
-	
+
 	/**
 	 * @return int The total size in bytes of the folder (recursive)
 	 */
@@ -63,7 +63,7 @@ class DirItem extends Item
 		}
 		return $this -> temp_list -> size_recursive();
 	}
-	
+
 	/**
 	 * @return int The total number of files in the folder (recursive)
 	 */
@@ -75,7 +75,7 @@ class DirItem extends Item
 		}
 		return $this -> temp_list -> num_files();
 	}
-	
+
 	/**
 	 * @param string $path
 	 * @return string The parent directory of $path
@@ -96,15 +96,15 @@ class DirItem extends Item
 		$path = substr($path, 0, $pos + 1);
 		return (($path === false) ? '' : $path);
 	}
-	
+
 	/**
 	 * @param string $parent_dir
 	 * @param string $filename
 	 */
-	public function __construct($parent_dir, $filename)
+	public function __construct($parent_dir, $filename, $filemtime = null)
 	{
 		$filename = self::make_sure_slash($filename);
-		parent::__construct($parent_dir, $filename);
+		parent::__construct($parent_dir, $filename, $filemtime);
 		global $config, $subdir;
 		$this -> downloads = '&nbsp;';
 		if ($filename == '../')
@@ -131,7 +131,7 @@ class DirItem extends Item
 		else
 		//regular folder
 		{
-			if (!@is_dir($this -> parent_dir . $filename))
+			if (false && !@is_dir($this -> parent_dir . $filename))
 			{
 				throw new ExceptionDisplay('Directory <em>'
 				. Url::html_output($this -> parent_dir . $filename)
@@ -143,7 +143,7 @@ class DirItem extends Item
 			. Url::translate_uri(substr($this -> parent_dir, strlen($config -> __get('base_dir'))) . $filename);
 		}
 	}
-	
+
 	/**
 	 * @param string $var The key to look for
 	 * @return mixed The data stored at the key
